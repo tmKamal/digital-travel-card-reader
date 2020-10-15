@@ -6,14 +6,20 @@ import {
   InputLabel,
   makeStyles,
   MenuItem,
-  Paper,
   Select,
+  Skeleton,
   Typography,
 } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import QrReader from "react-qr-reader";
+import CustomButton from "../components/customBtn";
+import InfoCard from "../components/infoCard";
 import WelcomeCard from "../components/welcomeCard";
 import { useHttpClient } from "../hooks/http-hook";
+import useSound from "use-sound";
+import successFx from "../assets/sounds/success.mp3";
+import alertFx from "../assets/sounds/alert.wav";
+import AlertCard from "../components/alertCard";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,15 +34,23 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  marginY: {
+    marginTop: "20px",
+  },
+  media:{
+      height:260
+  }
 }));
 
 const QrScanner = () => {
   const classes = useStyles();
   const [qrResult, setQrResult] = useState();
   const [journeyDetails, setJourneyDetails] = useState();
-  const { isLoading, sendRequest } = useHttpClient();
+  const { isLoading, sendRequest, error, errorPopupCloser } = useHttpClient();
   const [location, setLocation] = useState("");
   const busId = "5f8703f32e0d6e428094097f";
+  const [playSuccess] = useSound(successFx);
+  const [playAlert] = useSound(alertFx);
 
   useEffect(() => {
     const requestJourney = async () => {
@@ -46,16 +60,21 @@ const QrScanner = () => {
         location,
       };
 
-      try {
-        setJourneyDetails(
-          await sendRequest(
-            `https://urbanticket.herokuapp.com/api/journey/stat`,
-            "POST",
-            JSON.stringify(journeyInfo),
-            { "Content-Type": "application/json" }
-          )
-        );
-      } catch (err) {}
+      if (qrResult) {
+        try {
+          setJourneyDetails(
+            await sendRequest(
+              `http://localhost:8000/api/journey/stat`,
+              "POST",
+              JSON.stringify(journeyInfo),
+              { "Content-Type": "application/json" }
+            )
+          );
+        } catch (err) {}
+      } else {
+        setJourneyDetails(null);
+      }
+
     };
     requestJourney();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,6 +92,25 @@ const QrScanner = () => {
   const handleChange = (event) => {
     setLocation(event.target.value);
   };
+  // reset the scanner
+  const reloadScanner = () => {
+    setJourneyDetails(null);
+    setQrResult(null);
+    errorPopupCloser();
+  };
+
+  useEffect(() => {
+    if (qrResult) {
+      if (error) {
+        playAlert();
+        setTimeout(() => {
+          playAlert();
+        }, 1300);
+      } else {
+        playSuccess();
+      }
+    }
+  }, [qrResult, error, playSuccess, playAlert]);
 
   return (
     <Container maxWidth="xl">
@@ -119,7 +157,10 @@ const QrScanner = () => {
                 !isLoading &&
                 journeyDetails &&
                 journeyDetails.status === "start" && (
-                  <div>Put your belt onn!!</div>
+                  <InfoCard
+                    name={journeyDetails.passengerName}
+                    info={"Please have a seat!!!"}
+                  ></InfoCard>
                 )}
               {/* Kill the Journey and kick out the passenger */}
               {qrResult &&
@@ -127,16 +168,36 @@ const QrScanner = () => {
                 journeyDetails &&
                 journeyDetails.status === "end" && (
                   <React.Fragment>
-                    <div>Have a nice day. Stay safe!</div>
-                    <div>Total Cost : {journeyDetails.journey.cost}</div>
+
+                    <InfoCard
+                      name={journeyDetails.passengerName}
+                      totalCost={journeyDetails.journey.cost}
+                      info={"we hope you enjoyed the journey."}
+                    ></InfoCard>
+
                   </React.Fragment>
                 )}
-              <p>{qrResult}</p>
+              {error && <AlertCard error={error}></AlertCard>}
+              {/* skelton loading */}
+              {isLoading&&<Skeleton animation="wave" variant="rect" className={classes.media} />}
             </React.Fragment>
           </Grid>
           <Grid item xs={12} sm={6}>
             <WelcomeCard></WelcomeCard>
-            <Paper className={classes.paper}>xs=12 sm=6 and height</Paper>
+
+
+            {qrResult && !isLoading && (
+              <CustomButton
+                onClick={reloadScanner}
+                variant="contained"
+                color="primary"
+                disableRipple
+                className={classes.marginY}
+              >
+                SCAN ME
+              </CustomButton>
+            )}
+
           </Grid>
         </Grid>
       </Box>
