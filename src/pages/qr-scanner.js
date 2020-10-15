@@ -49,7 +49,7 @@ const QrScanner = () => {
       try {
         setJourneyDetails(
           await sendRequest(
-            `http://localhost:8000/api/journey/stat`,
+            `https://urbanticket.herokuapp.com/api/journey/stat`,
             "POST",
             JSON.stringify(journeyInfo),
             { "Content-Type": "application/json" }
