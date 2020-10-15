@@ -49,7 +49,7 @@ const QrScanner = () => {
       try {
         setJourneyDetails(
           await sendRequest(
-            `http://localhost:8000/api/journey/stat`,
+            `https://urbanticket.herokuapp.com/api/journey/stat`,
             "POST",
             JSON.stringify(journeyInfo),
             { "Content-Type": "application/json" }
@@ -127,7 +127,7 @@ const QrScanner = () => {
                 journeyDetails &&
                 journeyDetails.status === "end" && (
                   <React.Fragment>
-                    <div>Have a nice day. Stay Safe!</div>
+                    <div>Have a nice day. Stay safe!</div>
                     <div>Total Cost : {journeyDetails.journey.cost}</div>
                   </React.Fragment>
                 )}
@@ -136,7 +136,7 @@ const QrScanner = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <WelcomeCard></WelcomeCard>
-            <Paper className={classes.paper}>xs=12 sm=6</Paper>
+            <Paper className={classes.paper}>xs=12 sm=6 and height</Paper>
           </Grid>
         </Grid>
       </Box>
