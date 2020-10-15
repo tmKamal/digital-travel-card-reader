@@ -127,7 +127,7 @@ const QrScanner = () => {
                 journeyDetails &&
                 journeyDetails.status === "end" && (
                   <React.Fragment>
-                    <div>Have a nice day. Stay Safe!</div>
+                    <div>Have a nice day. Stay Safeerr!</div>
                     <div>Total Cost : {journeyDetails.journey.cost}</div>
                   </React.Fragment>
                 )}
