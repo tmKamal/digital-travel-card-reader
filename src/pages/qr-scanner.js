@@ -136,7 +136,7 @@ const QrScanner = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <WelcomeCard></WelcomeCard>
-            <Paper className={classes.paper}>xs=12 sm=6</Paper>
+            <Paper className={classes.paper}>xs=12 sm=6 and height</Paper>
           </Grid>
         </Grid>
       </Box>
