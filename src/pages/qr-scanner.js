@@ -59,6 +59,7 @@ const QrScanner = () => {
         userId: qrResult,
         location,
       };
+
       if (qrResult) {
         try {
           setJourneyDetails(
@@ -73,6 +74,7 @@ const QrScanner = () => {
       } else {
         setJourneyDetails(null);
       }
+
     };
     requestJourney();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -166,11 +168,13 @@ const QrScanner = () => {
                 journeyDetails &&
                 journeyDetails.status === "end" && (
                   <React.Fragment>
+
                     <InfoCard
                       name={journeyDetails.passengerName}
                       totalCost={journeyDetails.journey.cost}
                       info={"we hope you enjoyed the journey."}
                     ></InfoCard>
+
                   </React.Fragment>
                 )}
               {error && <AlertCard error={error}></AlertCard>}
@@ -180,6 +184,7 @@ const QrScanner = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <WelcomeCard></WelcomeCard>
+
 
             {qrResult && !isLoading && (
               <CustomButton
@@ -192,6 +197,7 @@ const QrScanner = () => {
                 SCAN ME
               </CustomButton>
             )}
+
           </Grid>
         </Grid>
       </Box>
