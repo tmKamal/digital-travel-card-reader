@@ -66,7 +66,7 @@ const QrScanner = () => {
         try {
           setJourneyDetails(
             await sendRequest(
-              `https://urbanticket.herokuapp.com/api/journey/stat`,
+              `${process.env.REACT_APP_BACKEND_API}/api/journey/stat`,
               "POST",
               JSON.stringify(journeyInfo),
               { "Content-Type": "application/json" }
@@ -117,7 +117,7 @@ const QrScanner = () => {
     const fetchRoutes = async () => {
       try {
         const response = await sendRequest(
-          `https://urbanticket.herokuapp.com/api/bus-route/get/${auth.route.route}`
+          `${process.env.REACT_APP_BACKEND_API}/api/bus-route/get/${auth.route.route}`
         );
         console.log(response.route.route);
         response.route.route.forEach(function (loc) {

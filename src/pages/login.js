@@ -86,7 +86,7 @@ export default function Login() {
     };
     try {
       const response = await sendRequest(
-        `https://urbanticket.herokuapp.com/api/bus/login`,
+        `${process.env.REACT_APP_BACKEND_API}/api/bus/login`,
         "POST",
         JSON.stringify(busInfo),
         { "Content-Type": "application/json" }
