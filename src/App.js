@@ -7,19 +7,20 @@ import {
 } from "react-router-dom";
 import { AuthContext } from "./context/auth-context";
 import Login from "./pages/login";
+import Logout from "./pages/logout";
 import QrScanner from "./pages/qr-scanner";
 
 export default function App() {
   const [token, setToken] = useState();
   const [regNo, setRegNo] = useState();
   const [route, setRoute] = useState();
-  const [isLoading,setIsLoading]=useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const login = useCallback((regNo, token, route) => {
     setToken(token);
     setRegNo(regNo);
     setRoute(route);
-    setIsLoading(true);
+    
 
     localStorage.setItem(
       "busData",
@@ -29,7 +30,19 @@ export default function App() {
         route: route,
       })
     );
+
     console.log("auto logged in" + route + " " + token);
+    setIsLoading(false);
+  }, []);
+
+  const logout = useCallback(() => {
+    setToken(null);
+    setRegNo(null);
+    setRoute(null);
+
+    localStorage.removeItem("busData");
+    localStorage.clear();
+    return <Redirect to={"/login"} />;
   }, []);
 
   // automatic login at start up (using local storage)
@@ -38,6 +51,7 @@ export default function App() {
     if (storedData && storedData.token) {
       login(storedData.regNO, storedData.token, storedData.route);
     }
+    setIsLoading(false);
   }, [login]);
 
   let reactRoutes;
@@ -46,6 +60,9 @@ export default function App() {
       <Switch>
         <Route path="/" exact>
           <QrScanner />
+        </Route>
+        <Route path="/logout" exact>
+          <Logout />
         </Route>
         <Redirect to="/" />
       </Switch>
@@ -68,9 +85,10 @@ export default function App() {
         regNo: regNo,
         route: route,
         login: login,
+        logout: logout,
       }}
     >
-      <Router>{reactRoutes}</Router>
+      {!isLoading&&<Router>{reactRoutes}</Router>}
     </AuthContext.Provider>
   );
 }

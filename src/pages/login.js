@@ -1,57 +1,60 @@
-import React,{useState,useContext} from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState, useContext } from "react";
+import Avatar from "@material-ui/core/Avatar";
+import Button from "@material-ui/core/Button";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
+import Link from "@material-ui/core/Link";
+import Paper from "@material-ui/core/Paper";
+import Box from "@material-ui/core/Box";
+import Grid from "@material-ui/core/Grid";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
 import { useHttpClient } from "../hooks/http-hook";
-import { AuthContext } from '../context/auth-context';
+import { AuthContext } from "../context/auth-context";
+import { Alert, AlertTitle } from "@material-ui/core";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
+      {"Copyright © "}
       <Link color="inherit" href="https://material-ui.com/">
         Your Website
-      </Link>{' '}
+      </Link>{" "}
       {new Date().getFullYear()}
-      {'.'}
+      {"."}
     </Typography>
   );
 }
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: '100vh',
+    height: "100vh",
   },
   image: {
-    backgroundImage: 'url(https://source.unsplash.com/random)',
-    backgroundRepeat: 'no-repeat',
+    backgroundImage: "url(https://source.unsplash.com/random)",
+    backgroundRepeat: "no-repeat",
     backgroundColor:
-      theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+      theme.palette.type === "light"
+        ? theme.palette.grey[50]
+        : theme.palette.grey[900],
+    backgroundSize: "cover",
+    backgroundPosition: "center",
   },
   paper: {
     margin: theme.spacing(8, 4),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%', // Fix IE 11 issue.
+    width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -62,39 +65,37 @@ const useStyles = makeStyles((theme) => ({
 export default function Login() {
   const classes = useStyles();
   const auth = useContext(AuthContext);
-  const [values,setValues]=useState({
-      "regNo":"",
-      "password":""
+  const [values, setValues] = useState({
+    regNo: "",
+    password: "",
   });
-  const{regNo,password}=values;
-  const { isLoading, sendRequest, error, errorPopupCloser } = useHttpClient();
-  const onChangeHandler=(e)=>{
-      errorPopupCloser();
+  const { regNo, password } = values;
+  const { sendRequest, error, errorPopupCloser } = useHttpClient();
+  const onChangeHandler = (e) => {
+    errorPopupCloser();
     setValues({
-        ...values,
-        [e.target.name]:e.target.value
-    })
-  }
-  const submitHandler=async(e)=>{
-      e.preventDefault();
-    const busInfo={
-        regNo,
-        password
-    }
+      ...values,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    const busInfo = {
+      regNo,
+      password,
+    };
     try {
-        
-         const response= await sendRequest(
-            `http://localhost:8000/api/bus/login`,
-            "POST",
-            JSON.stringify(busInfo),
-            { "Content-Type": "application/json" }
-          );
-          if(response && response.bus && response.token){
-            auth.login(response.bus.regNo, response.token,response.bus.route);
-          }
-       
-      } catch (err) {}
-  }
+      const response = await sendRequest(
+        `https://urbanticket.herokuapp.com/api/bus/login`,
+        "POST",
+        JSON.stringify(busInfo),
+        { "Content-Type": "application/json" }
+      );
+      if (response && response.bus && response.token) {
+        auth.login(response.bus._id, response.token, response.bus);
+      }
+    } catch (err) {}
+  };
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -109,7 +110,7 @@ export default function Login() {
           </Typography>
           <form className={classes.form} noValidate onSubmit={submitHandler}>
             <TextField
-                onChange={onChangeHandler}
+              onChange={onChangeHandler}
               variant="outlined"
               margin="normal"
               required
@@ -121,7 +122,7 @@ export default function Login() {
               autoFocus
             />
             <TextField
-            onChange={onChangeHandler}
+              onChange={onChangeHandler}
               variant="outlined"
               margin="normal"
               required
@@ -145,7 +146,12 @@ export default function Login() {
             >
               Sign In
             </Button>
-            
+            {error && (
+              <Alert severity="error">
+                <AlertTitle>{error}</AlertTitle>
+              </Alert>
+            )}
+
             <Box mt={5}>
               <Copyright />
             </Box>
