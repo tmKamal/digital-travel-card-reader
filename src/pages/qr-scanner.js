@@ -1,5 +1,6 @@
 import {
   Box,
+  CircularProgress,
   Container,
   FormControl,
   Grid,
@@ -7,10 +8,9 @@ import {
   makeStyles,
   MenuItem,
   Select,
-  Skeleton,
   Typography,
 } from "@material-ui/core";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import QrReader from "react-qr-reader";
 import CustomButton from "../components/customBtn";
 import InfoCard from "../components/infoCard";
@@ -20,6 +20,7 @@ import useSound from "use-sound";
 import successFx from "../assets/sounds/success.mp3";
 import alertFx from "../assets/sounds/alert.wav";
 import AlertCard from "../components/alertCard";
+import { AuthContext } from "../context/auth-context";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,9 +38,9 @@ const useStyles = makeStyles((theme) => ({
   marginY: {
     marginTop: "20px",
   },
-  media:{
-      height:260
-  }
+  media: {
+    height: 260,
+  },
 }));
 
 const QrScanner = () => {
@@ -48,19 +49,20 @@ const QrScanner = () => {
   const [journeyDetails, setJourneyDetails] = useState();
   const { isLoading, sendRequest, error, errorPopupCloser } = useHttpClient();
   const [location, setLocation] = useState("");
-  const busId = "5f8703f32e0d6e428094097f";
   const [playSuccess] = useSound(successFx);
   const [playAlert] = useSound(alertFx);
-
+  const auth = useContext(AuthContext);
+  const [routeArray, setRouteArray] = useState([]);
   useEffect(() => {
     const requestJourney = async () => {
-      let journeyInfo = {
-        busId,
-        userId: qrResult,
-        location,
-      };
-
-      if (qrResult) {
+      //console.log("busId: "+auth.regNo);
+      //console.log(`busId: ${auth.route.regNo}, route: ${auth.route.route}, busRegNO: ${auth.route.regNo}`)
+      if (qrResult && auth) {
+        let journeyInfo = {
+          busId: auth.route._id,
+          userId: qrResult,
+          location,
+        };
         try {
           setJourneyDetails(
             await sendRequest(
@@ -74,7 +76,6 @@ const QrScanner = () => {
       } else {
         setJourneyDetails(null);
       }
-
     };
     requestJourney();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,7 +99,7 @@ const QrScanner = () => {
     setQrResult(null);
     errorPopupCloser();
   };
-
+  // sound alert
   useEffect(() => {
     if (qrResult) {
       if (error) {
@@ -111,6 +112,25 @@ const QrScanner = () => {
       }
     }
   }, [qrResult, error, playSuccess, playAlert]);
+  // fetch routes
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const response = await sendRequest(
+          `https://urbanticket.herokuapp.com/api/bus-route/get/${auth.route.route}`
+        );
+        console.log(response.route.route);
+        response.route.route.forEach(function (loc) {
+          console.log(loc.name);
+          setRouteArray((oldArray) => [...oldArray, loc.name]);
+        });
+      } catch (err) {}
+    };
+    if (auth) {
+      fetchRoutes();
+    }
+    // eslint-disable-next-line
+  }, [auth]);
 
   return (
     <Container maxWidth="xl">
@@ -133,12 +153,14 @@ const QrScanner = () => {
                 <MenuItem value="">
                   <em>None</em>
                 </MenuItem>
-                <MenuItem value={"kaduwela"}>Kaduwela</MenuItem>
-                <MenuItem value={"malabe"}>Malabe</MenuItem>
-                <MenuItem value={"koswatta"}>Koswatta</MenuItem>
-                <MenuItem value={"battaramulla"}>Battaramulla</MenuItem>
-                <MenuItem value={"kotta road"}>Kotta road</MenuItem>
-                <MenuItem value={"kollupitiya"}>Kollupitiya</MenuItem>
+                {!isLoading &&
+                  routeArray &&
+                  routeArray.map((r, id) => (
+                    <MenuItem key={id} value={r}>
+                      {r}
+                    </MenuItem>
+                  ))}
+                {console.log(routeArray)}
               </Select>
             </FormControl>
           </Grid>
@@ -168,23 +190,20 @@ const QrScanner = () => {
                 journeyDetails &&
                 journeyDetails.status === "end" && (
                   <React.Fragment>
-
                     <InfoCard
                       name={journeyDetails.passengerName}
                       totalCost={journeyDetails.journey.cost}
                       info={"we hope you enjoyed the journey."}
                     ></InfoCard>
-
                   </React.Fragment>
                 )}
               {error && <AlertCard error={error}></AlertCard>}
               {/* skelton loading */}
-              {isLoading&&<Skeleton animation="wave" variant="rect" className={classes.media} />}
+              {isLoading && <CircularProgress />}
             </React.Fragment>
           </Grid>
           <Grid item xs={12} sm={6}>
             <WelcomeCard></WelcomeCard>
-
 
             {qrResult && !isLoading && (
               <CustomButton
@@ -197,7 +216,6 @@ const QrScanner = () => {
                 SCAN ME
               </CustomButton>
             )}
-
           </Grid>
         </Grid>
       </Box>
