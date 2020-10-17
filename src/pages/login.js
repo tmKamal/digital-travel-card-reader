@@ -15,13 +15,14 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useHttpClient } from "../hooks/http-hook";
 import { AuthContext } from "../context/auth-context";
 import { Alert, AlertTitle } from "@material-ui/core";
+import signUpImage from "../assets/images/bus-login.jpg";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        SLIIT LogiX (WE24)
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -34,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     height: "100vh",
   },
   image: {
-    backgroundImage: "url(https://source.unsplash.com/random)",
+    backgroundImage: `url(${signUpImage})`,
     backgroundRepeat: "no-repeat",
     backgroundColor:
       theme.palette.type === "light"
