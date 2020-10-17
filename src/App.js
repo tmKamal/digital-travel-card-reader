@@ -6,50 +6,54 @@ import {
   Redirect,
 } from "react-router-dom";
 import { AuthContext } from "./context/auth-context";
-import Login from "./pages/login";
-import Logout from "./pages/logout";
-import QrScanner from "./pages/qr-scanner";
+import Login from "./pages/auth/login";
+import Logout from "./pages/auth/logout";
+import SignUp from "./pages/auth/signup";
+import JourneyHistory from "./pages/journey/journey-history";
+import MainMenu from "./pages/main-menu";
+import MakePayment from "./pages/make-payment/make-payment";
+
 
 export default function App() {
   const [token, setToken] = useState();
-  const [regNo, setRegNo] = useState();
-  const [route, setRoute] = useState();
+  const [name, setName] = useState();
+  const [mgr, setMgr] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
-  const login = useCallback((regNo, token, route) => {
+  const login = useCallback((name, token, mgr) => {
     setToken(token);
-    setRegNo(regNo);
-    setRoute(route);
+    setName(name);
+    setMgr(mgr);
     
 
     localStorage.setItem(
-      "busData",
+      "mgrData",
       JSON.stringify({
-        regNo: regNo,
+        name: name,
         token: token,
-        route: route,
+        mgr: mgr,
       })
     );
 
-    console.log("auto logged in" + route + " " + token);
+    console.log("auto logged in" + mgr + " " + token);
     setIsLoading(false);
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
-    setRegNo(null);
-    setRoute(null);
+    setName(null);
+    setMgr(null);
 
-    localStorage.removeItem("busData");
+    localStorage.removeItem("mgrData");
     localStorage.clear();
     return <Redirect to={"/login"} />;
   }, []);
 
   // automatic login at start up (using local storage)
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("busData"));
+    const storedData = JSON.parse(localStorage.getItem("mgrData"));
     if (storedData && storedData.token) {
-      login(storedData.regNO, storedData.token, storedData.route);
+      login(storedData.name, storedData.token, storedData.mgr);
     }
     setIsLoading(false);
   }, [login]);
@@ -59,10 +63,17 @@ export default function App() {
     reactRoutes = (
       <Switch>
         <Route path="/" exact>
-          <QrScanner />
+          <MainMenu></MainMenu>
         </Route>
+        <Route path="/make-payments" exact>
+          <MakePayment></MakePayment>
+        </Route>
+        <Route path="/journey-history" exact>
+          <JourneyHistory></JourneyHistory>
+        </Route>
+
         <Route path="/logout" exact>
-          <Logout />
+          <Logout></Logout>
         </Route>
         <Redirect to="/" />
       </Switch>
@@ -71,7 +82,10 @@ export default function App() {
     reactRoutes = (
       <Switch>
         <Route path="/login" exact>
-          <Login />
+          <Login></Login>
+        </Route>
+        <Route path="/signup" exact>
+          <SignUp></SignUp>
         </Route>
         <Redirect to="/login" />
       </Switch>
@@ -82,8 +96,8 @@ export default function App() {
       value={{
         isLoggedIn: !!token,
         token: token,
-        regNo: regNo,
-        route: route,
+        name: name,
+        mgr: mgr,
         login: login,
         logout: logout,
       }}
