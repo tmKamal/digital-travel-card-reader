@@ -6,9 +6,11 @@ import {
   Redirect,
 } from "react-router-dom";
 import { AuthContext } from "./context/auth-context";
+import Gmap from "./pages/g-map";
 import Login from "./pages/login";
 import Logout from "./pages/logout";
 import QrScanner from "./pages/qr-scanner";
+
 
 export default function App() {
   const [token, setToken] = useState();
@@ -64,6 +66,9 @@ export default function App() {
         <Route path="/logout" exact>
           <Logout />
         </Route>
+        <Route path="/map" exact>
+          <Gmap></Gmap>
+        </Route>
         <Redirect to="/" />
       </Switch>
     );
@@ -73,6 +78,7 @@ export default function App() {
         <Route path="/login" exact>
           <Login />
         </Route>
+        
         <Redirect to="/login" />
       </Switch>
     );
