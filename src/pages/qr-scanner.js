@@ -1,5 +1,6 @@
 import {
   Box,
+  Card,
   CircularProgress,
   Container,
   FormControl,
@@ -14,13 +15,13 @@ import React, { useState, useEffect, useContext } from "react";
 import QrReader from "react-qr-reader";
 import CustomButton from "../components/customBtn";
 import InfoCard from "../components/infoCard";
-import WelcomeCard from "../components/welcomeCard";
 import { useHttpClient } from "../hooks/http-hook";
 import useSound from "use-sound";
 import successFx from "../assets/sounds/success.mp3";
 import alertFx from "../assets/sounds/alert.wav";
 import AlertCard from "../components/alertCard";
 import { AuthContext } from "../context/auth-context";
+import GMapJourney from "../components/gMapJourney";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,6 +42,12 @@ const useStyles = makeStyles((theme) => ({
   media: {
     height: 260,
   },
+  mapCardWidth:{
+    width:"100%"
+  },
+  mapCardHeight:{
+    height:"70%"
+  }
 }));
 
 const QrScanner = () => {
@@ -119,11 +126,12 @@ const QrScanner = () => {
         const response = await sendRequest(
           `${process.env.REACT_APP_BACKEND_API}/api/bus-route/get/${auth.route.route}`
         );
-        console.log(response.route.route);
-        response.route.route.forEach(function (loc) {
-          console.log(loc.name);
-          setRouteArray((oldArray) => [...oldArray, loc.name]);
-        });
+        console.log('here is the rustle')
+        console.log(response.route);
+   
+          
+          setRouteArray(response.route.route);
+     
       } catch (err) {}
     };
     if (auth) {
@@ -138,7 +146,7 @@ const QrScanner = () => {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Typography variant="h4" align="center" component="h1" gutterBottom>
-              Ticket Scanner v.01
+              Smart Card Scanner v.01
             </Typography>
             <FormControl variant="outlined" className={classes.formControl}>
               <InputLabel id="demo-simple-select-outlined-label">
@@ -157,7 +165,7 @@ const QrScanner = () => {
                   routeArray &&
                   routeArray.map((r, id) => (
                     <MenuItem key={id} value={r}>
-                      {r}
+                      {r.name}
                     </MenuItem>
                   ))}
                 {console.log(routeArray)}
@@ -203,7 +211,11 @@ const QrScanner = () => {
             </React.Fragment>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <WelcomeCard></WelcomeCard>
+            {/* <WelcomeCard></WelcomeCard> */}
+                  <Card elevation={3} className={classes.mapCardWidth, classes.mapCardHeight}>
+
+            {routeArray&&<GMapJourney busStops={routeArray}></GMapJourney>}
+                  </Card>
 
             {qrResult && !isLoading && (
               <CustomButton
