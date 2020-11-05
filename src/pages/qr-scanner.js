@@ -85,7 +85,7 @@ const QrScanner = () => {
       }
     };
     requestJourney();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [qrResult, sendRequest]);
 
   const handleScan = async (data) => {
