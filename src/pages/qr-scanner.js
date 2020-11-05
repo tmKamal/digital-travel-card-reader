@@ -127,7 +127,7 @@ const QrScanner = () => {
           `${process.env.REACT_APP_BACKEND_API}/api/bus-route/get/${auth.route.route}`
         );
         console.log('here is the rustle')
-        console.log(response.route);
+        console.log(response.route.route);
    
           
           setRouteArray(response.route.route);
@@ -214,7 +214,7 @@ const QrScanner = () => {
             {/* <WelcomeCard></WelcomeCard> */}
                   <Card elevation={3} className={classes.mapCardWidth, classes.mapCardHeight}>
 
-            {routeArray&&<GMapJourney busStops={routeArray}></GMapJourney>}
+            {!isLoading&&auth &&routeArray.length&&routeArray[1].name&&<GMapJourney busStops={routeArray}></GMapJourney>}
                   </Card>
 
             {qrResult && !isLoading && (
