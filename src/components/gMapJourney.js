@@ -130,8 +130,8 @@ function GMapJourney(props) {
         );
       })}
       {/* Current location */}
-      {currentLocation !=null&&<Marker
-        position={currentLocation}
+      {props.currentPosition !=null&&<Marker
+        position={props.currentPosition}
         icon={{
           url: busIcon,
           scaledSize: new window.google.maps.Size(40, 40),
@@ -139,7 +139,7 @@ function GMapJourney(props) {
           anchor: new window.google.maps.Point(15, 15),
         }}
       ></Marker>}
-      {console.log(currentLocation)}
+      {console.log(props.currentPosition)}
       {/* direction */}
       {props.busStops&&props.busStops[props.busStops.length-1].latlng&&<DirectionsService
         // required
