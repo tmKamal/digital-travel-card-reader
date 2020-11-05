@@ -134,10 +134,10 @@ const QrScanner = () => {
      
       } catch (err) {}
     };
-    if (auth) {
+   
       fetchRoutes();
-    }
-    // eslint-disable-next-line
+
+    
   }, [auth]);
 
   return (
