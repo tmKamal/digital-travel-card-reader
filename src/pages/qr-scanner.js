@@ -55,7 +55,7 @@ const QrScanner = () => {
   const [qrResult, setQrResult] = useState();
   const [journeyDetails, setJourneyDetails] = useState();
   const { isLoading, sendRequest, error, errorPopupCloser } = useHttpClient();
-  const [location, setLocation] = useState("hi");
+  const [location, setLocation] = useState("");
   const [playSuccess] = useSound(successFx);
   const [playAlert] = useSound(alertFx);
   const auth = useContext(AuthContext);
@@ -212,7 +212,7 @@ const QrScanner = () => {
               elevation={3}
               className={(classes.mapCardWidth, classes.mapCardHeight)}
             >
-              {!isLoading &&
+              {
                 auth &&
                 routeArray.length &&
                 routeArray[1].name && location.latlng&&(
