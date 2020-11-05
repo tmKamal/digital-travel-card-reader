@@ -42,12 +42,12 @@ const useStyles = makeStyles((theme) => ({
   media: {
     height: 260,
   },
-  mapCardWidth:{
-    width:"100%"
+  mapCardWidth: {
+    width: "100%",
   },
-  mapCardHeight:{
-    height:"70%"
-  }
+  mapCardHeight: {
+    height: "70%",
+  },
 }));
 
 const QrScanner = () => {
@@ -55,7 +55,7 @@ const QrScanner = () => {
   const [qrResult, setQrResult] = useState();
   const [journeyDetails, setJourneyDetails] = useState();
   const { isLoading, sendRequest, error, errorPopupCloser } = useHttpClient();
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState("hi");
   const [playSuccess] = useSound(successFx);
   const [playAlert] = useSound(alertFx);
   const auth = useContext(AuthContext);
@@ -85,7 +85,6 @@ const QrScanner = () => {
       }
     };
     requestJourney();
-    
   }, [qrResult, sendRequest]);
 
   const handleScan = async (data) => {
@@ -126,18 +125,15 @@ const QrScanner = () => {
         const response = await sendRequest(
           `${process.env.REACT_APP_BACKEND_API}/api/bus-route/get/${auth.route.route}`
         );
-        console.log('here is the rustle')
+        console.log("here is the rustle");
         console.log(response.route.route);
-   
-          
-          setRouteArray(response.route.route);
-     
+
+        setRouteArray(response.route.route);
+        setLocation(response.route.route[0])
       } catch (err) {}
     };
-   
-      fetchRoutes();
 
-    
+    fetchRoutes();
   }, [auth]);
 
   return (
@@ -212,10 +208,17 @@ const QrScanner = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             {/* <WelcomeCard></WelcomeCard> */}
-                  <Card elevation={3} className={classes.mapCardWidth, classes.mapCardHeight}>
-
-            {!isLoading&&auth &&routeArray.length&&routeArray[1].name&&<GMapJourney busStops={routeArray}></GMapJourney>}
-                  </Card>
+            <Card
+              elevation={3}
+              className={(classes.mapCardWidth, classes.mapCardHeight)}
+            >
+              {!isLoading &&
+                auth &&
+                routeArray.length &&
+                routeArray[1].name && location.latlng&&(
+                  <GMapJourney currentPosition={location.latlng} busStops={routeArray}></GMapJourney>
+                )}
+            </Card>
 
             {qrResult && !isLoading && (
               <CustomButton
